@@ -13,8 +13,8 @@ build/
 dist/
 *.egg-info/
 
-# Streamlit
-.streamlit/
+# Streamlit local cache
+.streamlit/secrets.toml
 
 # IDE
 .vscode/
