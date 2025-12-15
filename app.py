@@ -56,20 +56,17 @@ if 'similarity_results' not in st.session_state:
 # Sidebar - File Upload and Settings
 st.sidebar.header("📁 Data Upload")
 
-# Add info icon with SQL query tooltip
-col1, col2 = st.sidebar.columns([4, 1])
-with col1:
-    uploaded_file = st.file_uploader(
-        "Upload Meeting Data CSV",
-        type=['csv'],
-        help="Upload CSV file with meeting data including GPS coordinates, trader info, and retailer details",
-        key="csv_uploader"
-    )
-with col2:
-    with st.popover("ℹ️"):
-        st.markdown("### SQL Query to Generate CSV")
-        st.code("""
-SELECT
+# Add file uploader with info icon
+uploaded_file = st.sidebar.file_uploader(
+    "Upload Meeting Data CSV",
+    type=['csv'],
+    help="Upload CSV file with meeting data including GPS coordinates, trader info, and retailer details"
+)
+
+# Add SQL query reference
+with st.sidebar.expander("ℹ️ SQL Query Reference"):
+    st.markdown("**SQL Query to Generate CSV:**")
+    st.code("""SELECT
     DATE_FORMAT(fm.created_at,'%Y-%m-%d') as meetingDate,
     lpa.uniqueId as dsid,
     lpa.city as Darkstore,
@@ -97,9 +94,8 @@ INNER JOIN fos_users fu ON fu.fosId=fm.fosId
 INNER JOIN lp_address lpa ON lpa.uniqueId = fu.dsId
 WHERE DATE_FORMAT(fm.created_at,'%Y%m')=202512
 GROUP BY fm.buyerid, DATE_FORMAT(fm.created_at,'%Y%m%d')
-ORDER BY meetingDate;
-        """, language="sql")
-        st.caption("Use this query to extract meeting data from your database")
+ORDER BY meetingDate;""", language="sql")
+    st.caption("Use this query to extract meeting data from your database")
 
 # Load default CSV if available and no file uploaded
 if uploaded_file is None and not st.session_state.data_loaded:
