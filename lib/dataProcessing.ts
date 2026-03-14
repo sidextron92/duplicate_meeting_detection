@@ -84,19 +84,20 @@ export function applyFilters(rows: Row[], filters: Filters): Row[] {
   }
 
   if (filters.lastMeetingAfter) {
-    // Find last meeting date per buyer
+    // Find last meeting date per buyerid+traderId pair
     const lastMeeting: Record<string, string> = {}
     for (const r of filtered) {
-      if (!lastMeeting[r.buyerid] || r.meetingDate > lastMeeting[r.buyerid]) {
-        lastMeeting[r.buyerid] = r.meetingDate
+      const key = `${r.buyerid}::${r.traderId}`
+      if (!lastMeeting[key] || r.meetingDate > lastMeeting[key]) {
+        lastMeeting[key] = r.meetingDate
       }
     }
-    const buyersToKeep = new Set(
+    const pairsToKeep = new Set(
       Object.entries(lastMeeting)
         .filter(([, date]) => date >= filters.lastMeetingAfter!)
-        .map(([id]) => id)
+        .map(([key]) => key)
     )
-    filtered = filtered.filter(r => buyersToKeep.has(r.buyerid))
+    filtered = filtered.filter(r => pairsToKeep.has(`${r.buyerid}::${r.traderId}`))
   }
 
   return filtered
